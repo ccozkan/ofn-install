@@ -46,6 +46,15 @@ br-prod
 br-staging
 
 #------------------------------------------------------------------------------
+# Colombia
+
+[co-prod]
+openfoodcolombia.org
+
+[co:children]
+co-prod
+
+#------------------------------------------------------------------------------
 # Canada
 
 [ca-prod]
@@ -118,10 +127,10 @@ es-staging
 # France
 
 [fr-prod]
-www.openfoodfrance.org ansible_host=51.68.226.206
+www.coopcircuits.fr ansible_host=51.68.226.206
 
 [fr-staging]
-staging.openfoodfrance.org ansible_host=149.202.55.45
+staging.coopcircuits.fr ansible_host=149.202.55.45
 
 [fr:children]
 fr-prod
@@ -205,3 +214,4 @@ de
 be
 za
 br
+co

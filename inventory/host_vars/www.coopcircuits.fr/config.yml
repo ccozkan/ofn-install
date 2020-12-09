@@ -1,19 +1,19 @@
 ---
 
-domain: www.openfoodfrance.org
+domain: www.coopcircuits.fr
 host_id: fr-prod
 rails_env: production
 
-admin_email: admin@openfoodfrance.org
+admin_email: admin@coopcircuits.fr
 
-mail_domain: openfoodfrance.org
+mail_domain: coopcircuits.fr
 
 unicorn_timeout: 240
 unicorn_workers: 4
 
 certbot_domains:
-  - www.openfoodfrance.org
-  - openfoodfrance.org
+  - www.coopcircuits.fr
+  - coopcircuits.fr
 
 postgres_listen_addresses:
   - '*'
@@ -23,3 +23,6 @@ custom_hba_entries:
 
 enable_nginx_logging: true
 enable_rails_apm: "true" # has to be explicitly defined as a string due to some datadog bug
+
+attachment_path: "home/openfoodnetwork/apps/openfoodnetwork/current/public/spree/products/:id/:style/:basename.:extension"
+attachment_url: ofn-prod.s3.us-east-1.amazonaws.com

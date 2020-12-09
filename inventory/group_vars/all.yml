@@ -23,7 +23,6 @@ git_version: "{{ github_key.split(':')[1] }}"
 
 l10n_git_version: HEAD
 
-
 #----------------------------------------------------------------------
 # Default values (should be overridden in each server config)
 rails_env: staging
@@ -105,6 +104,13 @@ postgresql_global_config_options:
 debezium_version: "0.10.0.Final"
 
 #----------------------------------------------------------------------
+# Yarn/node variables
+npm_prefix: "/usr/local/lib/npm"
+
+node_version: 14.x
+yarn_version: 1.22.4
+
+#----------------------------------------------------------------------
 # App variables
 app: openfoodnetwork
 # Paths
@@ -165,6 +171,7 @@ logrotate_applications:
         options:
           - daily         # run daily
           - rotate 0      # don't rotate files
+          - missingok     # ignore missing logs
           - nocreate      # don't replace log files
         lastaction:       # delete log files older than 1 day
           - "find /var/log/pg_log/ -name '*.log' -mtime +1 -exec rm {};"
@@ -196,6 +203,7 @@ core_devs:
   - luis
   - matt
   - kristina
+  - andy
 
 #----------------------------------------------------------------------
 # nginx config
@@ -225,6 +233,8 @@ nginx_acme_challenge_config: |+
     root /etc/letsencrypt/webrootauth;
   }
 
+nginx_valid_methods: limit_except GET POST PUT PATCH DELETE OPTIONS { deny all; }
+
 nginx_sites:
   default:
     - |
@@ -252,6 +262,7 @@ nginx_sites:
       {{ nginx_acme_challenge_config }}
 
       location / {
+        {{ nginx_valid_methods }}
         return 301 https://$host$request_uri;
       }
 
@@ -277,12 +288,15 @@ nginx_sites:
 
       try_files $uri/index.html $uri @unicorn;
       location @unicorn {
+        {{ nginx_valid_methods }}
+
         if (-f /etc/nginx/maintenance.html) {
           return 503;
         }
 
         gzip_proxied no-cache no-store private expired auth;
         proxy_http_version 1.1;
+        proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
@@ -291,6 +305,7 @@ nginx_sites:
       }
 
       location ~ ^/(assets)/ {
+        {{ nginx_valid_methods }}
         gzip_static on;
         brotli_static on;
         expires max;
@@ -301,6 +316,7 @@ nginx_sites:
       error_page 503 @maintenance;
 
       location @maintenance {
+        {{ nginx_valid_methods }}
         root /etc/nginx;
         try_files /maintenance.html =503;
       }

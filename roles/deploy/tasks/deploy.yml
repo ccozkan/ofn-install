@@ -67,6 +67,16 @@
     - skip_ansible_lint
   notify: restart unicorn
 
+# Install JS dependencies with yarn
+
+- name: run yarn install
+  yarn:
+    path: "{{ build_path }}"
+    executable: "{{ npm_prefix }}/bin/yarn"
+    production: yes
+  become: true
+  become_user: "{{ unicorn_user }}"
+
 # Update the database
 
 - name: check database status
@@ -103,10 +113,12 @@
     - skip_ansible_lint
   notify: restart unicorn
 
-# Precompile assets
-
-- name: precompile assets
-  import_tasks: precompile.yml
+- name: precompile assets # noqa 301
+  command: bash -lc "bundle exec rake assets:precompile RAILS_ENV={{ rails_env }}"
+  args:
+    chdir: "{{ build_path }}"
+  become: yes
+  become_user: "{{ unicorn_user }}"
 
 # Note: this task can be removed after all servers have been provisioned and deployed
 - name: delete current path unless it's a symlink
