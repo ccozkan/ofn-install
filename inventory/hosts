@@ -163,6 +163,12 @@ www.openfoodnetwork.org.za
 [za:children]
 za-prod
 
+[tr-prod]
+www.acikgida.com ansible_host=178.157.15.9 ansible_port=23422
+
+[tr:children]
+tr-prod
+
 #------------------------------------------------------------------------------
 # Europe
 
@@ -215,3 +221,4 @@ be
 za
 br
 co
+tr
