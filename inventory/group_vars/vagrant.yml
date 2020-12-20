@@ -19,6 +19,8 @@ users_sysadmin:
   - enricostn
   - pau
 
+unicorn_env_vars: |
+  PROFILE=true
 
 # Override default nginx settings because we don't have TLS
 nginx_sites:
