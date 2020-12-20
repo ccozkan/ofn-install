@@ -1,0 +1,19 @@
+---
+# See https://github.com/openfoodfoundation/ofn-install/wiki/Setup for more info
+checkout_zone: Europe
+country_code: TR
+currency: TRY
+locale: tr
+available_locales: tr,en
+language: tr.UTF-8
+language_packages:
+  - language-pack-en-base
+l10n_repo: https://github.com/edbezci/l10_tr.git
+timezone: Istanbul
+
+# Used for the LetsEncrypt email setting
+developer_email: fatihorhan@gmail.com
+
+# Users listed here will have their key from /files/keys added to the unicorn_user
+users_sysadmin:
+  - "{{ core_devs }}"

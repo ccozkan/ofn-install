@@ -21,6 +21,7 @@ users_sysadmin:
 
 unicorn_env_vars: |
   PROFILE=true
+  KILL_UNICORNS=true
 
 # Override default nginx settings because we don't have TLS
 nginx_sites:

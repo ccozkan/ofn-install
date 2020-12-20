@@ -1,0 +1,11 @@
+domain: www.acikgida.com
+host_id: tr-prod # country initials (eg uk, es, de) and environment (default is prod)
+rails_env: production
+
+mail_domain: www.acikgida.com
+
+admin_email: fatihorhan@gmail.com
+
+certbot_domains:
+  - www.acikgida.com
+  - acikgida.com
