@@ -4,14 +4,14 @@
 
 # See https://github.com/openfoodfoundation/ofn-install/wiki/Setup for more info
 checkout_zone: Australia
-country_code: TR
-currency: TRY
-locale: tr
-language: tr.UTF-8
+country_code: AU
+currency: AUD
+locale: en
+language: en_AU.UTF-8
 language_packages:
   - language-pack-en-base
-l10n_repo: https://github.com/edbezci/l10_tr.git
-timezone: Istanbul
+l10n_repo: https://github.com/openfoodfoundation/l10n_au.git
+timezone: Melbourne
 
 developer_email: admin@example.com
 
@@ -19,9 +19,6 @@ users_sysadmin:
   - enricostn
   - pau
 
-unicorn_env_vars: |
-  PROFILE=true
-  KILL_UNICORNS=true
 
 # Override default nginx settings because we don't have TLS
 nginx_sites:
