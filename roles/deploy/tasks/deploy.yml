@@ -11,6 +11,9 @@
     force: yes
   tags: clone
 
+- name: check redis required/present
+  include_tasks: check_redis.yml
+
 - name: symlink custom assets into the build
   file:
     src: "{{ item.src }}"
@@ -19,13 +22,13 @@
     state: link
     force: yes
   with_items:
-    - { src: "{{ assets_path }}", dest: "{{ build_path }}/public/assets" }
     - { src: "{{ system_path }}", dest: "{{ build_path }}/public/system" }
     - { src: "{{ images_path }}", dest: "{{ build_path }}/public/images" }
     - { src: "{{ files_path }}", dest: "{{ build_path }}/public/files" }
     - { src: "{{ spree_path }}", dest: "{{ build_path }}/public/spree" }
     - { src: "{{ config_path }}/database.yml", dest: "{{ build_path }}/config/database.yml" }
     - { src: "{{ config_path }}/application.yml", dest: "{{ build_path }}/config/application.yml" }
+    - { src: "{{ config_path }}/.env.{{ rails_env }}", dest: "{{ build_path }}/.env.{{ rails_env }}" }
     - { src: "{{ l10n_path }}/states.yml", dest: "{{ build_path }}/db/default/spree/states.yml" }
   tags: symlink
 
@@ -47,7 +50,7 @@
 - name: install bundler
   # This needs to be run inside a bash shell to initialise rbenv
   # See http://stackoverflow.com/questions/22115936/install-bundler-gem-using-ansible
-  command: bash -lc "./script/install-bundler --no-ri --no-rdoc"
+  command: bash -lc "./script/install-bundler"
   args:
     chdir: "{{ build_path }}"
   register: bundler
@@ -74,7 +77,6 @@
   yarn:
     path: "{{ build_path }}"
     executable: "{{ npm_prefix }}/bin/yarn"
-    production: yes
   become: true
   become_user: "{{ unicorn_user }}"
 
@@ -92,6 +94,14 @@
   args:
     chdir: "{{ build_path }}"
   when: table_exists.stdout.find('0 rows') != -1
+  tags:
+    - rake
+    - skip_ansible_lint
+
+- name: clear transient data
+  command: bash -lc "bundle exec rake ofn:data:remove_transient_data RAILS_ENV={{ rails_env }}"
+  args:
+    chdir: "{{ build_path }}"
   tags:
     - rake
     - skip_ansible_lint
@@ -141,5 +151,5 @@
   become: yes
   notify:
     - restart unicorn
-    - restart delayed_job
+    - update jobs queue
     - update whenever

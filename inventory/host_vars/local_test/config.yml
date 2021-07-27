@@ -1,7 +1,7 @@
 ---
 
 domain: localhost
-host_id: vagrant-dev
+host_id: ofn-test
 rails_env: development
 
 admin_email: admin@example.com
@@ -19,3 +19,6 @@ mail_host: 'example.com'
 mail_port: 25
 smtp_username: 'admin'
 smtp_password: 'password'
+
+rbenv_extra_depends: []
+ruby_compile_options: ""

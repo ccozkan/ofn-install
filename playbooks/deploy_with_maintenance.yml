@@ -36,9 +36,9 @@
         become: yes
         become_user: root
 
-      - name: stop delayed job
+      - name: stop sidekiq
         service:
-          name: delayed_job_{{ app }}
+          name: sidekiq
           state: stopped
         become: yes
         become_user: root
@@ -47,11 +47,6 @@
           name: deploy
 
       - meta: flush_handlers # Ensure handlers run successfully before reporting success
-
-      - name: refresh products cache
-        command: "{{ bundle_path }} exec rake ofn:cache:warm_products"
-        args:
-          chdir: "{{ current_path }}"
 
       - name: disable maintenance mode
         import_role:

@@ -77,12 +77,23 @@
       tags: dbserver
       db_user_roles: CREATEDB,REPLICATION
 
+    - role: libre_ops.multi_redis
+      vars:
+        multiredis_disable_default_instance: false
+      become: yes
+      become_user: root
+      tags: redis
+
+    - role: sidekiq
+      tags: sidekiq
+
     - role: coopdevs.certbot_nginx
       become: yes
       vars:
         domain_name: "{{ certbot_domains | default([domain]) | join(',') }}"
         letsencrypt_email: "{{ developer_email }}"
         certbot_nginx_cert_name: "{{ certbot_cert_name | default(domain) }}"
+        certbot_version: "0.31.0-2~deb10u1+ubuntu{{ ansible_distribution_version }}.1+certbot+3"
       when: inventory_hostname not in groups['local']
       tags: certbot
 

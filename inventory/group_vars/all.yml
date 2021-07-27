@@ -50,14 +50,37 @@ swapfile_size: false
 
 #----------------------------------------------------------------------
 # Rails variables
-ruby_version: 2.3.7
+ruby_version: 2.7.3
+
+rbenv_extra_depends:
+  - libjemalloc-dev
+
+ruby_compile_options: "--with-jemalloc"
 
 ruby_versions:
-  - version: 2.3.7
+  - version: 2.5.8
+  - version: 2.5.9
+  - version: 2.7.3  
+    env:
+      RUBY_CONFIGURE_OPTS: "{{ ruby_compile_options }}"
 
 env:
   RAILS_ENV: "{{ rails_env }}"
   PATH: "{{ gem_home }}/bin:{{ ansible_env.PATH }}"
+
+multiredis_instances:
+  - name: cache
+    port: 6380
+    configs: |
+      maxmemory 124mb
+      maxmemory-policy allkeys-lru
+  - name: jobs
+    port: 6381
+    configs: |
+      maxmemory 50mb
+      maxmemory-policy noeviction
+      appendonly yes
+      appendfsync everysec
 
 #----------------------------------------------------------------------
 # Database variables
@@ -98,6 +121,8 @@ postgresql_global_config_options:
     value: "{{ postgres_listen_addresses | join(',') }}"
   - option: shared_preload_libraries
     value: "{{ postgres_shared_preload_libraries | join(',') }}"
+  - option: wal_sender_timeout
+    value: "300000"
   - option: include_dir
     value: "conf.d"
 
@@ -125,7 +150,6 @@ backup_path: "{{ app_path }}/backups"
 releases_path: "{{ app_path }}/releases-old"
 rollback_path: "{{ app_path }}/rollback"
 rollback_sql_path: "{{ app_path }}/rollback.sql.gz"
-assets_path: "{{ shared_path }}/assets"
 system_path: "{{ shared_path }}/system"
 images_path: "{{ shared_path }}/images"
 files_path: "{{ shared_path }}/files"
@@ -200,11 +224,11 @@ memcached_value_max_megabytes: 4
 core_devs:
   - maikel
   - pau
-  - enricostn
-  - luis
   - matt
-  - kristina
   - andy
+  - filipe
+  - jb
+  - david
 
 #----------------------------------------------------------------------
 # nginx config
@@ -301,6 +325,7 @@ nginx_sites:
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Request-Start "t=${msec}";
         proxy_redirect off;
         proxy_pass http://unicorn;
       }
@@ -338,3 +363,13 @@ nginx_configs:
 
 # Use python2.7 interpeter
 ansible_python_interpreter: '/usr/bin/python2.7'
+
+# Fix for renamed branch in rbenv-install repo
+rbenv_plugins:
+  - { name: "rbenv-vars",         repo: "https://github.com/rbenv/rbenv-vars.git",         version: "master" }
+  - { name: "ruby-build",         repo: "https://github.com/rbenv/ruby-build.git",         version: "master" }
+  - { name: "rbenv-default-gems", repo: "https://github.com/rbenv/rbenv-default-gems.git", version: "master" }
+  - { name: "rbenv-installer",    repo: "https://github.com/rbenv/rbenv-installer.git",    version: "main" }
+  - { name: "rbenv-update",       repo: "https://github.com/rkh/rbenv-update.git",         version: "master" }
+  - { name: "rbenv-whatis",       repo: "https://github.com/rkh/rbenv-whatis.git",         version: "master" }
+  - { name: "rbenv-use",          repo: "https://github.com/rkh/rbenv-use.git",            version: "master" }

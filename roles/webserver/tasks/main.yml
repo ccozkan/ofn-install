@@ -4,17 +4,13 @@
   template:
     src={{ item.src }}
     dest={{ item.dest }}
-    mode="0744"
-    owner={{ unicorn_user }}
-    group={{ unicorn_user }}
+    mode="0644"
   become: yes
   with_items:
     - { src: "unicorn.service.j2", dest: "/etc/systemd/system/unicorn_{{ app }}.service" }
     - { src: "unicorn_environment.j2", dest: "{{ shared_path }}/unicorn_environment" }
-    - { src: "delayed_job.service.j2", dest: "/etc/systemd/system/delayed_job_{{ app }}.service" }
   register: unicorn_service_files
   notify:
-    - restart nginx
     - restart unicorn if running
   tags: init
 
@@ -22,7 +18,7 @@
   template:
     src: unicorn.rb.j2
     dest: "{{ config_path }}/unicorn.rb"
-    mode: 0744
+    mode: 0644
     owner: "{{ unicorn_user }}"
     group: "{{ unicorn_user }}"
   become: yes
@@ -46,9 +42,3 @@
   become: yes
   tags: init
 
-- name: Enable delayed_job unit
-  service:
-    name: "delayed_job_{{ app }}"
-    enabled: yes
-  become: yes
-  tags: init
